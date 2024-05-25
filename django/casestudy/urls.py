@@ -17,7 +17,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 
-from casestudy.views import LoginView
+from casestudy.views import LoginView, SecurityView, WatchlistView
 
 urlpatterns = [
     # The only url defined in the casestudy application are the admin urls. The admin urls are defined in the
@@ -26,4 +26,8 @@ urlpatterns = [
     path('admin/', admin.site.urls),
 
     path('login/', LoginView.as_view(), name='login'),
+
+    path('securities/', SecurityView.as_view(), name='security'),
+
+    path('watchlist/', WatchlistView.as_view(), name='watchlist')
 ]

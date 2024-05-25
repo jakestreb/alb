@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 import os
 from pathlib import Path
+from datetime import timedelta
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -139,4 +140,17 @@ CACHES = {
         "BACKEND": "django.core.cache.backends.redis.RedisCache",
         "LOCATION": "redis://redis:6379",
     }
+}
+
+CELERY_BROKER_URL = "redis://redis:6379"
+CELERY_RESULT_CASESTUDY = "redis://redis:6379"
+CELERY_BEAT_SCHEDULE = {
+    "update_tickers": {
+        "task": "casestudy.tasks.update_tickers",
+        "schedule": timedelta(minutes=60),
+    },
+    "update_prices": {
+        "task": "casestudy.tasks.update_prices",
+        "schedule": timedelta(seconds=5),
+    },
 }
