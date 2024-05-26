@@ -29,5 +29,5 @@ urlpatterns = [
 
     path('securities/', SecurityView.as_view(), name='security'),
 
-    path('watchlist/', WatchlistView.as_view(), name='watchlist')
+    path('watchlist/<ticker>', WatchlistView.as_view(), name='watchlist')
 ]

@@ -1,6 +1,7 @@
 import './App.css';
 import { LoginForm } from './LoginForm';
 import { UserContext } from './UserContext';
+import { SearchForm } from './SearchForm.jsx';
 import { useState, useCallback, useMemo } from 'react';
 import { User } from "./User.jsx";
 
@@ -21,7 +22,7 @@ function App() {
         </header>
         {user && (
           <section>
-            Your content goes here
+            <SearchForm />
           </section>
         )}
       </div>

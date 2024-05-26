@@ -8,6 +8,7 @@ from rest_framework.views import APIView
 from rest_framework import authentication, permissions
 from rest_framework.response import Response
 from django.contrib.auth.models import User
+from django.db.models import Q
 from casestudy.models import Security
 
 
@@ -44,8 +45,11 @@ class SecurityView(APIView):
         Search securities by name or ticker
         """
         query = request.GET.get('search_query')
-        # securities = Security.objects.filter(name__contains=query) TODO Implement
-        securities = [Security(ticker='AAPL', name='Apple Inc')]
+        securities = []
+        if query:
+            securities = Security.objects.filter(Q(name__icontains=query) | Q(ticker__icontains=query))
+        else:
+            securities = Security.objects.all()
         response = {
             'items': map(self.format_search_result, securities)
         }
@@ -64,24 +68,22 @@ class WatchlistView(APIView):
     permission_classes = [permissions.AllowAny]
 
     # TODO Should likely be returned via websocket
-    def get(self, request):
-        """
-        Return watchlist securities for a user
-        """
-        user_securities = WatchlistItem.objects.filter(user_id=user.request.id)
-        return Response(user_securities)
+    # def get(self, request):
+    #     """
+    #     Return watchlist securities for a user
+    #     """
+    #     user_securities = WatchlistItem.objects.filter(user_id=user.request.id)
+    #     return Response(user_securities)
 
-    def post(self, request):
+    def post(self, request, ticker):
         """
         Adds a security to a user's watchlist
         """
-        ticker = request.data['ticker']
         watchlist_item = WatchlistItem(user_id=user.request.id, ticker=ticker)
         watchlist_item.save()
 
-    def delete(self, request):
+    def delete(self, request, ticker):
         """
         Removes a security from a user's watchlist
         """
-        ticker = request.data['ticker']
         WatchlistItem.objects.get(id=id).delete()

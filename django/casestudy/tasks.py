@@ -16,7 +16,6 @@ def update_tickers():
 
 @shared_task
 def update_prices():
-    print('running update_prices')
     PriceUpdateJob().run()
 
 

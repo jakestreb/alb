@@ -34,7 +34,7 @@ services:
       - db
       - redis
 
-  # Celery beat (period task scheduler)
+  # Celery beat (periodic task scheduler)
   celery-beat:
     image: celery-beat:local
     build:
