@@ -1,0 +1,10 @@
+
+.option-ticker {
+    display: inline-block;
+    margin: 0 5px;
+    width: 75px;
+}
+
+.option-name {
+    color: grey;
+}

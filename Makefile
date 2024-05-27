@@ -44,6 +44,9 @@ migrate: ## Create and apply database migrations
 	docker compose run web python manage.py makemigrations
 	docker compose run web python manage.py migrate
 
+flush: ## Clear all db data
+	docker compose run web python manage.py flush
+
 open-admin: ## Open the Django admin page
 	open http://localhost:8000/admin
 

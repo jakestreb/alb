@@ -70,8 +70,10 @@ header {
 }
 
 .app section {
-  height: 100%;
+  flex: 1 0 0;
+  min-height: 0;
   margin: 60px;
+  padding: 40px;
   display: flex;
   justify-content: center;
   align-items: center;

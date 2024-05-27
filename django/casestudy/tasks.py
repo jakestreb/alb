@@ -2,6 +2,7 @@ import os
 import requests
 import time
 import redis
+import random
 from django.utils import timezone
 from casestudy.models import Security, WatchlistItem
 from celery import shared_task
@@ -37,6 +38,13 @@ class CaseStudyJob():
     def redis_set(self, key, value):
         return self.redis_inst.set(key, value)
 
+    def redis_set_many(self, key_value_dict):
+        pipe = self.redis_inst.pipeline()
+        for key in key_value_dict.keys():
+            if key_value_dict[key] is not None:
+                pipe.set(key, key_value_dict[key])
+        pipe.execute()
+
 
 class TickerUpdateJob(CaseStudyJob):
     """
@@ -44,7 +52,7 @@ class TickerUpdateJob(CaseStudyJob):
     """
     def run(self):
         print("TickerUpdateJob: running")
-        company_dict = self.get_tickers()
+        company_dict = self.fetch_tickers()
         ticker_iter = company_dict.keys()
         # Bulk create/update securities
         Security.objects.bulk_create(
@@ -57,7 +65,7 @@ class TickerUpdateJob(CaseStudyJob):
         self.redis_set(TICKER_LIST_KEY, ','.join(ticker_iter))
         print('TickerUpdateJob: ran successfully')
 
-    def get_tickers(self):
+    def fetch_tickers(self):
         return self.request_get('/stock/tickers')
 
 
@@ -66,23 +74,23 @@ class PriceUpdateJob(CaseStudyJob):
     Job that calls the stock price endpoint, updates DB price entries, and pushes updates to active users.
     """
     def run(self):
-        # TODO only run when there are currently active users?
         print("PriceUpdateJob: running")
         if not self.is_ticker_list_cached():
             print("PriceUpdateJob: no tickers cached while updating prices - starting TickerUpdateJob")
             TickerUpdateJob().run()
-        price_dict = self.get_prices()
-        ticker_iter = price_dict.keys()
-        # Bulk update security prices
-        Security.objects.bulk_update(
-            [Security(ticker=ticker, last_price=price_dict[ticker], updated_price_at=timezone.now()) for ticker in ticker_iter],
-            ['last_price', 'updated_price_at']
-        )
+        price_dict = self.fetch_prices()
+        # Bulk update security prices in redis
+        self.redis_set_many(price_dict)
         print("PriceUpdateJob: ran successfully")
 
     def is_ticker_list_cached(self):
         return bool(self.redis_get(TICKER_LIST_KEY))
 
-    def get_prices(self):
+    def fetch_prices(self):
         tickers = self.redis_get(TICKER_LIST_KEY)
-        return self.request_get('/stock/prices/?tickers={tickers}'.format(tickers=tickers))
+        price_dict = self.request_get('/stock/prices/?tickers={tickers}'.format(tickers=tickers))
+        # Add some randomness for fun to simulate the prices changing
+        for key in price_dict.keys():
+            if price_dict[key] is not None:
+                price_dict[key] = round(price_dict[key] + random.random(), 2)
+        return price_dict

@@ -24,30 +24,28 @@ class Security(models.Model):
 
     # The security’s ticker (e.g. NFLX)
     # NOTE that this will serve as the primary key for now, but ideally a static id would be used
-    # since tickers are liable to change
+    # since company tickers can change
     ticker = models.TextField(primary_key=True, null=False, blank=False)
 
     # The security’s name (e.g. Netflix Inc)
     name = models.TextField(null=False, blank=False)
 
-    # This field is used to store the last price of a security
-    last_price = models.DecimalField(
-        null=True, blank=True, decimal_places=2, max_digits=11,
-    )
-
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    updated_price_at = models.DateTimeField(null=True)
 
 class WatchlistItem(models.Model):
     """
     Represents a single Stock or ETF on a single user's watchlist.
     """
 
-    # The user's id
-    user_id = models.ForeignKey(User, on_delete=models.DO_NOTHING)
+    # The user
+    user = models.ForeignKey(User, db_index=True, on_delete=models.DO_NOTHING)
 
-    # The watchlist security’s ticker (e.g. NFLX)
-    ticker = models.TextField(null=False, blank=False)
+    # The watchlisted security
+    security = models.ForeignKey(Security, db_index=True, null=False, blank=False, on_delete=models.CASCADE)
 
     created_at = models.DateTimeField(auto_now_add=True)
+
+    # Prevent users from adding the same security multiple times
+    class Meta:
+        unique_together = ('user', 'security',)
