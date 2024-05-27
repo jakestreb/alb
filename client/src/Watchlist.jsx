@@ -25,7 +25,7 @@ export function Watchlist() {
   const startWatching = useCallback((item) => {
     http.postWatchlistItem(item.ticker)
     .then(() => {
-      setWatchlist([...watchlist, item]);
+      setWatchlist([item, ...watchlist]);
     })
     .catch((error) => {
       console.error('Unable to add watchlist item', error);

@@ -16,7 +16,7 @@ function getSimilarity(searchQuery, security) {
 }
 
 // Autocomplete built for security searching
-export function Search({ exclude, onSelect }) {
+export function Search({ exclude=[], onSelect=(() => {}) }) {
   // Form control.
   const [options, setOptions] = useState([""]); // Add only hidden default empty string option
 
@@ -44,6 +44,7 @@ export function Search({ exclude, onSelect }) {
       disablePortal
       blurOnSelect={true}
       clearOnBlur={true}
+      autoHighlight={true}
       id="search-box"
       // Fix value so that autocomplete never has a set selection
       value={""}
