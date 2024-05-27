@@ -123,7 +123,7 @@ class WatchlistView(APIView):
         """
         Removes a security from a user's watchlist
         """
-        WatchlistItem.objects.get(security_id=ticker).delete()
+        WatchlistItem.objects.get(user=request.user, security_id=ticker).delete()
         return Response()
 
     def format_watchlist_item(self, watchlist_item):

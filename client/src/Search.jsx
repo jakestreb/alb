@@ -1,5 +1,5 @@
 import './Search.css';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 import debounce from 'lodash/debounce';
 import Autocomplete from '@mui/material/Autocomplete';
 import TextField from '@mui/material/TextField';

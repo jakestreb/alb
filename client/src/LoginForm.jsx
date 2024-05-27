@@ -17,6 +17,9 @@ export function LoginForm() {
     http.postLogin(username, password)
     .then((data) => {
       login(data.user, data.token);
+      // Clear inputs
+      setUsername('');
+      setPassword('');
       console.info('Logged in successfully');
     })
     .catch((error) => {
