@@ -16,6 +16,9 @@ export function LoginForm() {
     event.preventDefault();
     http.postLogin(username, password)
     .then((data) => {
+      if (!data) {
+        throw Error('Login failed');
+      }
       login(data.user, data.token);
       // Clear inputs
       setUsername('');
